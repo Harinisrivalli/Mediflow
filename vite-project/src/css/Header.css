@@ -1,0 +1,12 @@
+#headers{
+    padding-left: 50px;
+    padding-top: 10px;
+    display:  grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+#title{
+    font-size: larger;
+    font: bolder;
+    color: white;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}

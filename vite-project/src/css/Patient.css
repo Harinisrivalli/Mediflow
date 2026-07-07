@@ -1,0 +1,149 @@
+#header{
+    height: 80px;
+    border-bottom: 2px solid slategrey;
+}
+#displayList{
+    width: 400px;
+    height: 100px;
+    gap: 10px;
+}
+#patientsmenus{
+    display: flex;
+    gap: 50px;
+    padding-left: 150px;
+}
+#dispMenu{
+    list-style: none;
+    display: flex;
+    gap: 35px;
+    border-radius: 5px;
+    border: 2px solid rgba(112, 128, 144, 0.868);
+    height: 40px;
+    width: 300px;
+    padding-left: 20px;
+    padding-top: 5px;
+}
+
+.radio{
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+}
+
+.radio:checked{
+    border-color: white;
+    background-color: rgba(112, 128, 144, 0.468);
+}
+
+.active{
+    background-color: rgba(112, 128, 144, 0.468);;
+    color: rgb(5, 5, 26);
+    border-radius: 5px;
+    height: 30px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.normal{
+    cursor: pointer;
+}
+
+#addPatientsform{
+    border-radius: 5px;
+    border: 2px solid slategrey;
+    width: 450px;
+}
+
+#dispform{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.btn{
+    background-color: aliceblue;
+    border: 2px solid white;
+    border-radius: 2px;
+    color: black;
+}
+
+.txtbox{
+    background-color: aliceblue;
+    border: 2px solid white;
+    border-radius: 2px;
+    color: black;
+}
+
+#addpatientsTable{
+    background-color: rgb(3, 3, 27);
+    color: rgb(241, 241, 245);
+    width: 450px;
+    height: 450px;
+    border-radius: 10px;
+    padding: 5px;
+    border: 2px solid slategray;
+}
+
+input[type="date"]{
+    background-color: white;
+    color: black;
+    border: 2px solid white;
+    border-radius: 2px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator{
+    filter: invert(1);
+    cursor: pointer;
+}
+.options{
+    background-color: whitesmoke;
+    color: black;
+}
+
+input[type="file"]::file-selector-button{
+    background-color: white;
+    border: 1px solid white;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#dispPatients{
+    width: 800x;
+    height: 800px;
+    padding: 30px;
+    padding-left: 100px;
+}
+#table{
+    border: 2px solid slategray;
+    padding: 10px;
+    width: 700px;
+    gap: 5px;
+    border-radius: 15px;
+    background-color: rgba(112, 128, 144, 0.468);
+}
+
+#viewPatients{
+    width: 800x;
+    height: 800px;
+}
+#viewPatients{
+    background-color: rgb(3, 3, 27);
+    width: 450px;
+    height: 450px;
+    border-radius: 10px;
+    padding: 5px;
+    border: 2px solid slategray;
+    color: whitesmoke;
+}

@@ -1,0 +1,40 @@
+.menu{
+    border-right: 2px solid slategray;
+    width: 280px;
+    min-height: 100vh;
+} 
+
+#mediflow{
+    padding-left: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid slategray;;
+}
+
+#menuoptions{
+    padding-top: 5px;
+    padding-left: 10px;
+    width: 250px;
+}
+
+.ullist{
+    list-style-type: none;
+    color: slategrey;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 15px;
+}
+
+.nav-link{
+    text-decoration:none;
+}
+
+.active-nav-link{
+  text-decoration:none; 
+  background: rgba(112, 128, 144, 0.468);;
+  border-radius: 25px;
+  color: slategray;
+  border-radius: 4px;
+  padding: 5px;
+}

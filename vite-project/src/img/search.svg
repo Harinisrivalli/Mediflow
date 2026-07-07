@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1"
+     id="Layer_1"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     x="0px"
+     y="0px"
+     width="24px"
+     height="24px"
+     viewBox="0 0 24 24"
+     enable-background="new 0 0 24 24"
+     xml:space="preserve">
+
+    <g>
+        <path fill="none"
+              stroke="#6B7AA6"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5,4
+                 C14.09,4 17,6.91 17,10.5
+                 C17,14.09 14.09,17 10.5,17
+                 C6.91,17 4,14.09 4,10.5
+                 C4,6.91 6.91,4 10.5,4
+                 Z"/>
+
+        <path fill="none"
+              stroke="#6B7AA6"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.2,15.2 L20,20"/>
+    </g>
+
+</svg>
