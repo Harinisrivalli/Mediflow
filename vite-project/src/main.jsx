@@ -4,7 +4,6 @@ import './index.css'
 import App from './App.jsx'
 import ErrorPage from './components/Error.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-
 import { lazy } from 'react'
 
 const DashBoard = lazy(() => import("./components/DashBoard.jsx"));

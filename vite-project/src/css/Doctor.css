@@ -19,7 +19,7 @@
     border-radius: 5px;
     border: 2px solid rgba(112, 128, 144, 0.868);
     height: 40px;
-    width: 300px;
+    width: 400px;
     padding-left: 20px;
     padding-top: 5px;
 }
@@ -120,7 +120,7 @@ input[type="file"]::file-selector-button{
 }
 
 #dispPatients{
-    width: 800x;
+    width: 800px;
     height: 800px;
     padding: 30px;
     padding-left: 100px;
@@ -134,16 +134,33 @@ input[type="file"]::file-selector-button{
     background-color: rgba(112, 128, 144, 0.468);
 }
 
-#viewPatients{
-    width: 800x;
-    height: 800px;
+#docdispform{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
-#viewPatients{
+#viewDoctors {
     background-color: rgb(3, 3, 27);
-    width: 450px;
-    height: 450px;
-    border-radius: 10px;
-    padding: 5px;
-    border: 2px solid slategray;
     color: whitesmoke;
+    width: 600px;
+    max-height: 80vh;
+    border: 2px solid slategray;
+    border-radius: 10px;
+    padding: 10px;
+    display: block;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+
+#viewDoctors::-webkit-scrollbar {
+    display: none;
 }
