@@ -5,6 +5,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
+import { Link } from "react-router-dom";
 function Doctors(){
     const [view,setView] = useState(false);
     const [doctorType, setDoctorType] = useState("All");
@@ -23,6 +24,11 @@ function Doctors(){
         {day:"Sunday",isAvailable:false, startTime:null,endTime:null},
     ]);
     const [doctorTobeViewed, setDoctorTobeViewed] = useState({});
+    const [total, setTotal] = useState(0);
+    const [Available, setAvailable] = useState(0);
+    const [onLeave, setOnLeave] = useState(0);
+    const [fullyBooked, setFullyBooked] = useState(0);
+    const [Unavailable, setUnavailable] =  useState(0);
 
     function handleView(item){
         setDoctorTobeViewed(item);
@@ -101,34 +107,32 @@ function Doctors(){
         }
     }
 
-    async function handleEdit(doctor) {
-        console.log(doctor);
-        var resp = await fetch("https://localhost:7286/api/doctor/" + doctor.id,{
-            method:"PATCH",
-            body:JSON.stringify(doctor),
-            headers:{
-                "Content-Type":"application/json"
-            }
-        });
-        if(resp.status == 200){
-            alert("Doctor Updated Successfully");
-            setView(false);
-            getDoctors();
-        }
-        else{
-            alert("Updation Failed");
-        }
-    }
     async function getDoctors() {
+        var onLeave = 0, Available = 0,fullyBooked = 0 , total =0, UnAvailable=0;
         const response = await fetch("https://localhost:7286/api/doctor",{
             method:"GET",
         });
         var resp = await response.json();
         if(response.status == 200){
+            for(var i = 0;i<resp.length;i++){
+                console.log(resp);
+                if(resp[i].status == "OnLeave"){
+                    setOnLeave(++onLeave);
+                }
+                else if(resp[i].status == "Available"){
+                    setAvailable(++Available);
+                }
+                else if(resp[i].status == "FullyBooked"){
+                    setFullyBooked(++fullyBooked);
+                }
+                else if(resp[i].status == "Unavailable"){
+                    setUnavailable(++UnAvailable);
+                }
+                setTotal(++total);
+            }
             setDoctors(resp);
         }
     }
-
     function checkAvailablity(availabilityItems){
         let count = 0;
         if(availabilityItems != undefined){
@@ -177,10 +181,11 @@ function Doctors(){
                             style={{
                                 height: "50px",
                                 width: "100px",
-                                backgroundColor: "transparent",
+                                backgroundColor: "rgba(112, 128, 144, 0.468)",
                                 borderRadius: "5px",
                                 border: "2px solid slategrey",
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                color: "rgb(5, 5, 26)"
                             }}
                         >
                             + Add Doctors
@@ -188,6 +193,28 @@ function Doctors(){
                     </div>
                 </section>
 
+                <section id="dispsubhead">
+                    <div className = "slot">
+                        <label style={{color:"#00C9A7"}}>Total</label><br/>
+                        <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{total}</span>
+                    </div>
+                    <div className ="slot">
+                        <label style={{color:"#00C9A7"}}>Available</label><br/>
+                        <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{Available}</span>
+                    </div>
+                    <div className = "slot">
+                        <label style={{color:"#00C9A7"}}>OnLeave</label><br/>
+                        <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{onLeave}</span>
+                    </div>
+                    <div className = "slot">
+                        <label style={{color:"#00C9A7"}}>Fully Booked</label><br/>
+                        <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{fullyBooked}</span>
+                    </div>
+                    <div className = "slot">
+                        <label style={{color:"#00C9A7"}}>InActive</label><br/>
+                        <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{Unavailable}</span>
+                    </div>
+                </section>
                 <section>
                     {dispForm && (
                         <div id="dispform">
@@ -306,7 +333,10 @@ function Doctors(){
                                                                         <label>From</label>
                                                                         <TimePicker
                                                                             value={item.startTime}
-                                                                            onChange={(value)=> changeFromTime(item.day,value)}
+                                                                            onChange={(value)=> {
+                                                                                const timeString = value ? value.format('HH:mm') : ''; 
+                                                                                changeFromTime(item.day,timeString);
+                                                                            }}
                                                                             slotProps={{
                                                                                 textField: {
                                                                                 sx: {
@@ -339,7 +369,10 @@ function Doctors(){
                                                                         <label>To</label>
                                                                         <TimePicker
                                                                             value={item.endTime}
-                                                                            onChange={(value)=> changeToTime( item.day, value)}
+                                                                            onChange={(value)=> {
+                                                                                const timeString = value ? value.format('HH:mm') : ''; 
+                                                                                changeToTime(item.day,timeString);
+                                                                            }}
                                                                             slotProps={{
                                                                                 textField: {
                                                                                 sx: {
@@ -412,7 +445,7 @@ function Doctors(){
                                 { doctorType == "All" && doctors.map(item =>{
                                     return(
                                         <tr key={item.id} className="trow">
-                                            <td><img src={`https://localhost:7286/${item.profilePhoto}`} style={{width:"40px",height:"40px", borderRadius:"20px"}} alt={item.fullName}/></td>
+                                            <td><img src={`https://localhost:7286/${item.profilePhoto}`} style={{width:"40px",height:"40px", borderRadius:"20px", textDecoration:"none"}} alt={item.fullName}/></td>
                                             <td style={{font:"caption"}}>
                                             {item.fullName}</td>
                                             <td>{item.specialization}</td>
@@ -420,14 +453,14 @@ function Doctors(){
                                             <td>{checkAvailablity(item.availabilitySlot)}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none", cursor:"pointer"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/doctors/${item.id}`} style={{backgroundColor:"transparent", border:"none" , textDecoration:"none"}}> 👁️ </Link>
                                                 <button style={{backgroundColor:"transparent", border:"none",cursor:"pointer"}} onClick={() => handleDelete(item.id)}>🗑️</button>
                                             </td>
                                         </tr>
                                     );
                                 })}
-                                { doctorType == "Available" && doctors.map(item =>{
-                                    return item.isActive && (
+                                { (doctorType == "Available") && doctors.map(item =>{
+                                    return (item.isActive && item.status=="Available") && (
                                         <tr key={item.id} className="trow">
                                             <td><img src={`https://localhost:7286/${item.profilePhoto}`} style={{width:"40px",height:"40px", borderRadius:"20px"}} alt={item.fullName}/></td>
                                             <td style={{font:"caption"}}>
@@ -437,14 +470,14 @@ function Doctors(){
                                             <td>{checkAvailablity(item.availabilitySlot)}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/doctors/${item.id}`} style={{backgroundColor:"transparent", border:"none", textDecoration:"none"}}> 👁️ </Link>
                                                 <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleDelete(item.id)}>🗑️</button>
                                             </td>
                                         </tr>
                                     );
                                 })}
                                 { doctorType == "OnLeave" && doctors.map(item =>{
-                                    return item.status == "OnLeave" && (
+                                    return (item.isActive && item.status=="OnLeave") && (
                                         <tr key={item.id} className="trow">
                                             <td><img src={`https://localhost:7286/${item.profilePhoto}`} style={{width:"40px",height:"40px", borderRadius:"20px"}} alt={item.fullName}/></td>
                                             <td style={{font:"caption"}}>
@@ -454,7 +487,7 @@ function Doctors(){
                                             <td>{checkAvailablity(item.availabilitySlot)}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/doctors/${item.id}`} style={{backgroundColor:"transparent", border:"none", textDecoration:"none"}}> 👁️ </Link>
                                             </td>
                                         </tr>
                                     );
@@ -470,7 +503,7 @@ function Doctors(){
                                             <td>{checkAvailablity(item.availabilitySlot)}</td>
                                             <td>{item.status}</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/doctors/${item.id}`} style={{backgroundColor:"transparent", border:"none", textDecoration:"none"}}> 👁️ </Link>
                                             </td>
                                         </tr>
                                     );
@@ -478,342 +511,6 @@ function Doctors(){
                             </tbody>
                         </table>
                     </div>
-                </section>
-            </div>
-            <div>
-                <section>
-                    {view && (
-                        <div id="docdispform">
-                            <table id="viewDoctors">
-                                    <tbody>
-                                        <tr>
-                                            <td colSpan="2" style={{ position: "relative" }}>
-                                                <span
-                                                    onClick={() => {
-                                                        setView(false);setEdit(false);
-                                                    }}
-                                                    style={{
-                                                        position: "absolute",
-                                                        top: "10px",
-                                                        right: "1px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"
-                                                    }}
-                                                >
-                                                    ✕
-                                                </span>
-                                                { !edit ? (<span onClick={() => setEdit(true)} style={{position: "absolute",
-                                                        top: "10px",
-                                                        right: "25px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"}}> ✏️</span>) : 
-                                                    (<span onClick={() => handleEdit(doctorTobeViewed)} style={{position: "absolute",
-                                                        top: "10px",
-                                                        right: "25px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"}}> 💾</span>) }
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colSpan="2"><span style={{color:"#00e5c4"}}>Basic Info</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><img src={`https://localhost:7286/${doctorTobeViewed.profilePhoto}`} style={{width:"80px",height:"80px", borderRadius:"45px"}} alt={doctorTobeViewed.fullName}></img></td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Full Name</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.fullName}</td> : <td><input type="text" value={doctorTobeViewed.fullName} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,fullName: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Specialization</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.specialization}</td> : <td><input type="text" id="eage" value={doctorTobeViewed.specialization} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,specialization: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Gender</label></td>
-                                            <td>{doctorTobeViewed.gender}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Birth Date</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.dob}</td> : <td><input type="date" value={doctorTobeViewed.dob} onChange={(e)=> setDoctorTobeViewed({...doctorTobeViewed,dob:e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td colSpan="2"><span style={{color:"#00e5c4"}}>Other Details</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Email</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.email}</td> : <td><input type="email" value={doctorTobeViewed.email} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,email: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Phone Number</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.phoneNo}</td> : <td><input type="tel" pattern="[0-9]{10}" value={doctorTobeViewed.phoneNo} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,phoneNo: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>licenseNo</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.licenseNo}</td> : <td><input type="text" value={doctorTobeViewed.licenseNo} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,licenseNo: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>qualification</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.qualification}</td> : <td><input type="text" value={doctorTobeViewed.qualification} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,qualification: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Consultation Fees</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.consultationFee}</td> : <td><input type="text" value={doctorTobeViewed.consultationFee} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,consultationFee: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Experience</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.experience}</td> : <td><input type="text" value={doctorTobeViewed.experience} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,experience: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>About</label></td>
-                                            {!edit ? <td>{doctorTobeViewed.about}</td> : <td><input type="text" value={doctorTobeViewed.about} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,about: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Status</label></td>
-                                            {!edit 
-                                            ?   <td>{doctorTobeViewed.status}</td> 
-                                            :   <td>
-                                                    <select value={doctorTobeViewed.status} onChange={(e) => setDoctorTobeViewed({...doctorTobeViewed,status: e.target.value})}>
-                                                        <option value="Available">Available</option>
-                                                        <option value="OnLeave">OnLeave</option>
-                                                        <option value="FullyBooked">Fully Booked</option>
-                                                    </select>
-                                                </td>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label>Weekly Availablity</label>
-                                                {!edit 
-                                                ? 
-                                                    <>
-                                                        {doctorTobeViewed.availabilitySlot.map(item =>{
-                                                            return (
-                                                                <div style={{
-                                                                            display: "flex",
-                                                                            alignItems: "center",
-                                                                            gap: "10px",
-                                                                            marginBottom: "10px",
-                                                                            flexWrap: "wrap"
-                                                                        }}>
-                                                                    <label>{item.day}</label>
-                                                                    <span>
-                                                                        <button id="avlbtn" className="btn" style={{cursor:"pointer", width:"80px" , height:"25px",borderRadius:"2px", borderStyle:"none"}}>Available</button>
-                                                                    </span>
-                                                                    <span>
-                                                                        <button id="unavlbtn" className="btn" style={{cursor:"pointer", width:"80px" , height:"25px",borderRadius:"2px", borderStyle:"none"}}> UnAvailable </button>
-                                                                    </span>
-                                                                    {item.isAvailable === true && (
-                                                                        <LocalizationProvider dateAdapter={AdapterDayjs} style={{color:"white"}}>
-                                                                            <span>
-                                                                                <label>From</label>
-                                                                                <TimePicker
-                                                                                    value={item.startTime ? dayjs(item.startTime) : null}
-                                                                                    slotProps={{
-                                                                                        textField: {
-                                                                                        sx: {
-                                                                                            width: 150,
-
-                                                                                            "& .MuiInputBase-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiInputBase-input": {
-                                                                                            color: "#fff",
-                                                                                            WebkitTextFillColor: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-section": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiSvgIcon-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-                                                                                        },
-                                                                                        },
-                                                                                    }}
-                                                                                />
-                                                                                <label>To</label>
-                                                                                <TimePicker
-                                                                                    value={item.endTime ? dayjs(item.endTime) : null}
-                                                                                    slotProps={{
-                                                                                        textField: {
-                                                                                        sx: {
-                                                                                            width: 150,
-
-                                                                                            "& .MuiInputBase-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiInputBase-input": {
-                                                                                            color: "#fff",
-                                                                                            WebkitTextFillColor: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-section": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiSvgIcon-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-                                                                                        },
-                                                                                        },
-                                                                                    }}
-                                                                                />
-                                                                            </span>
-                                                                        </LocalizationProvider>
-                                                                    )}
-                                                                <br/>
-                                                            </div>
-                                                            );
-                                                        })}
-                                                    </>
-                                                : 
-                                                    <>
-                                                        {doctorTobeViewed.availabilitySlot.map(item =>{
-                                                            return (
-                                                                <div style={{
-                                                                            display: "flex",
-                                                                            alignItems: "center",
-                                                                            gap: "10px",
-                                                                            marginBottom: "10px",
-                                                                            flexWrap: "wrap"
-                                                                        }}>
-                                                                    <label>{item.day}</label>
-                                                                    <span>
-                                                                        <button id="avlbtn" className="btn" style={{cursor:"pointer", width:"80px" , height:"25px",borderRadius:"2px", borderStyle:"none"}} onClick={() =>setDoctorTobeViewed({...doctorTobeViewed,availabilitySlot:doctorTobeViewed.availabilitySlot.map(obj =>{
-                                                                            if(item.day == obj.day ){
-                                                                                return {
-                                                                                    ...obj,
-                                                                                    isAvailable: true
-                                                                                }
-                                                                            }
-                                                                            return obj;
-                                                                        })})}>Available</button>
-                                                                    </span>
-                                                                    <span>
-                                                                        <button id="unavlbtn" className="btn" style={{cursor:"pointer", width:"80px" , height:"25px",borderRadius:"2px", borderStyle:"none"}} onClick={() =>setDoctorTobeViewed({...doctorTobeViewed,availabilitySlot:doctorTobeViewed.availabilitySlot.map(obj =>{
-                                                                            if(item.day == obj.day ){
-                                                                                return {
-                                                                                    ...obj,
-                                                                                    isAvailable: false
-                                                                                }
-                                                                            }
-                                                                            return obj;
-                                                                        })})}> UnAvailable </button>
-                                                                    </span>
-                                                                    {item.isAvailable === true && (
-                                                                        <LocalizationProvider dateAdapter={AdapterDayjs} style={{color:"white"}}>
-                                                                            <span>
-                                                                                <label>From</label>
-                                                                                <TimePicker
-                                                                                    value={item.startTime ? dayjs(item.startTime) : null}
-                                                                                    onChange={(value) =>setDoctorTobeViewed({...doctorTobeViewed,availabilitySlot:doctorTobeViewed.availabilitySlot.map(obj =>{
-                                                                                        if(item.day == obj.day ){
-                                                                                            return {
-                                                                                                ...obj,
-                                                                                                startTime:value?value.toISOString():null
-                                                                                            }
-                                                                                        }
-                                                                                        return obj;
-                                                                                    })})}
-                                                                                    slotProps={{
-                                                                                        textField: {
-                                                                                        sx: {
-                                                                                            width: 150,
-
-                                                                                            "& .MuiInputBase-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiInputBase-input": {
-                                                                                            color: "#fff",
-                                                                                            WebkitTextFillColor: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-section": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiSvgIcon-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-                                                                                        },
-                                                                                        },
-                                                                                    }}
-                                                                                />
-                                                                                <label>To</label>
-                                                                                <TimePicker
-                                                                                    value={item.endTime ? dayjs(item.endTime) : null}
-                                                                                    onChange={(value) =>setDoctorTobeViewed({...doctorTobeViewed,availabilitySlot:doctorTobeViewed.availabilitySlot.map(obj =>{
-                                                                                        if(item.day == obj.day ){
-                                                                                            return {
-                                                                                                ...obj,
-                                                                                                endTime:value?value.toISOString():null
-                                                                                            }
-                                                                                        }
-                                                                                        return obj;
-                                                                                    })})}
-                                                                                    slotProps={{
-                                                                                        textField: {
-                                                                                        sx: {
-                                                                                            width: 150,
-
-                                                                                            "& .MuiInputBase-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiInputBase-input": {
-                                                                                            color: "#fff",
-                                                                                            WebkitTextFillColor: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiPickersSectionList-section": {
-                                                                                            color: "#fff",
-                                                                                            },
-
-                                                                                            "& .MuiSvgIcon-root": {
-                                                                                            color: "#fff",
-                                                                                            },
-                                                                                        },
-                                                                                        },
-                                                                                    }}
-                                                                                />
-                                                                            </span>
-                                                                        </LocalizationProvider>
-                                                                    )}
-                                                                <br/>
-                                                            </div>
-                                                            );
-                                                        })}
-                                                    </>
-                                                }
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                        </div>
-                    )}
                 </section>
             </div>
         </>
