@@ -13,7 +13,10 @@ const Patients = lazy(() => import("./components/Patients.jsx"));
 const Invoices = lazy(() => import("./components/Invoices.jsx"));
 const Prescription = lazy(() => import("./components/Prescriptions.jsx"));
 const Settings = lazy(() => import("./components/Settings.jsx"));
-
+const PatientProfile = lazy(() => import("./components/PatientProfile.jsx"));
+const DoctorProfile = lazy(() => import("./components/DoctorProfile.jsx"));
+const AppointmentView = lazy(() =>  import("./components/AppointView.jsx"));
+const Appointment = lazy(() => import("./components/Appointments.jsx"));
 const appRouter = createBrowserRouter([
     {
       path: "/",
@@ -47,6 +50,18 @@ const appRouter = createBrowserRouter([
           path:"/invoices",
           element: <Suspense fallback={<div>Loading</div>}><Invoices/></Suspense>
         },
+        {
+          path:"/patients/:id",
+          element: <Suspense fallback={<div>Loading</div>}><PatientProfile/></Suspense>
+        },
+        {
+          path:"/doctors/:id",
+          element: <Suspense fallback={<div>Loading</div>}><DoctorProfile/></Suspense>
+        },
+        {
+          path:"/appointments/:id",
+          element: <Suspense fallback={<div>Loading</div>}><AppointmentView/></Suspense>
+        }
       ],
       errorElement: <ErrorPage/>
     }

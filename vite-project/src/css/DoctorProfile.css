@@ -1,0 +1,51 @@
+#header{
+    height: 80px;
+    border-bottom: 2px solid slategrey;
+}
+
+#profile{
+    border: 0.5px solid slategray;
+    width: 800px;
+    height: 100px;
+    border-radius: 10px;
+    display: flex;
+    align-items:center;
+    left: 20px;
+    margin-left: 30px;
+}
+
+.subpart{
+    border: 0.5px solid slategray;
+    width: 380px;
+    height: 60px;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.part1{
+    display: flex;
+    margin-left: 30px;
+    gap: 30px;
+}
+
+.txtbox{
+    background-color: aliceblue;
+    border: 2px solid white;
+    border-radius: 2px;
+    color: black;
+}
+.avlbtn{
+    background-color: rgba(112, 128, 144, 0.468);
+    color: rgb(5, 5, 26);
+    cursor: pointer;
+    width: 80px;
+    height: 25px;
+    border-radius: 2px;
+    border-style: none;
+}
+
+.weeklyavailablity{
+    width: 700px;
+    height: 500px;
+    padding: 5px;
+}

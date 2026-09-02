@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "./Header";
 import "../css/Patient.css";
 import PatientDetails from "./PatientDetails";
+import { Link } from "react-router-dom";
 
 function Patients() {
     const [patientType, setPatientsType] = useState("All");
@@ -12,6 +13,10 @@ function Patients() {
     const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     const [edit, setEdit] = useState(false);
     const [patientTobeEdited, setPatientTobeEdited] = useState({});
+    const [total, setTotal] = useState(0);
+    const [active, setActive] = useState(0);
+    const [inActive, setInActive] = useState(0);
+    const [newmonth, setNewMonth] = useState(0);
     function changeMenu(value) {
         setPatientsType(value);
         setEdit(true);
@@ -97,43 +102,39 @@ function Patients() {
 
     async function getPatients() {
         try{
+            var active = 0, inactive = 0,total = 0,newadmission = 0;
             const response = await fetch("https://localhost:7286/api/Patient");
             const data = await response.json();
             if(data.status.statusCode == 200){
+                data.data.forEach(patient => {
+                    total++;
+                    if(patient.isActive == true){
+                        active++;
+                    }
+                    if(patient.isActive == false){
+                        inactive++;
+                    }
+                    const date = new Date(patient.createdAt);
+                    const currentdate = new Date();
+                    if((date.getMonth() == currentdate.getMonth()) && (date.getFullYear() == currentdate.getFullYear())){
+                         newadmission++;
+                    }
+                });
                 setPatients(data.data);
             }
             else{
                 alert(data.message);
             }
+            setActive(active);
+            setInActive(inactive);
+            setTotal(total);
+            setNewMonth(newadmission);
         }
         catch(err){
             console.log(err);
         }
     }
-
-    async function handleEdit(item) {
-        console.log(item);
-        try{
-            const response = await fetch(
-                "https://localhost:7286/api/Patient/" + item.id,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(item)
-                }
-            );
-            if(response.status == 200){
-                alert("Updated Successfully");
-                getPatients();
-            }
-            setEdit(false);
-        }
-        catch(err){
-            console.log(err);
-        }
-    }
+    
     return (
         <> 
             <div style={{filter: view? "blur(10px)" : "none"}}>
@@ -156,15 +157,34 @@ function Patients() {
                             style={{
                                 height: "50px",
                                 width: "100px",
-                                backgroundColor: "transparent",
                                 borderRadius: "5px",
                                 border: "2px solid slategrey",
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                backgroundColor: "rgba(112, 128, 144, 0.468)",
+                                color: "rgb(5, 5, 26)"
                             }}
                         >
                             + Add Patients
                         </button>
                     </div>
+                </section>
+                <section id="dispsubhead">
+                        <div className = "slot">
+                            <label style={{color:"#00C9A7"}}>Total</label><br/>
+                            <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{total}</span>
+                        </div>
+                        <div className ="slot">
+                            <label style={{color:"#00C9A7"}}>Active</label><br/>
+                            <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{active}</span>
+                        </div>
+                        <div className = "slot">
+                            <label style={{color:"#00C9A7"}}>New This Month</label><br/>
+                            <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{newmonth}</span>
+                        </div>
+                        <div className ="slot">
+                            <label style={{color:"#00C9A7"}}>InActive</label><br/>
+                            <span style={{color:"rgba(234, 238, 243, 0.47)", fontSize:"25px"}}>{inActive}</span>
+                        </div>
                 </section>
 
                 <section>
@@ -246,7 +266,7 @@ function Patients() {
                         </div>
                     )}
                 </section>
-
+                
                 <section>
                     <div id="dispPatients">
                         <table id="table">
@@ -273,7 +293,7 @@ function Patients() {
                                             <td>NA</td>
                                             <td>1</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/patients/${item.id}`} style={{backgroundColor:"transparent", border:"none" , textDecoration:"none"}}> 👁️ </Link>
                                                 <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleDelete(item)}>🗑️</button>
                                             </td>
                                         </tr>
@@ -290,7 +310,7 @@ function Patients() {
                                             <td>NA</td>
                                             <td>1</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/patients/${item.id}`} style={{backgroundColor:"transparent", border:"none" , textDecoration:"none"}}> 👁️ </Link>
                                                 <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleDelete(item)}>🗑️</button>
                                             </td>
                                         </tr>
@@ -307,7 +327,7 @@ function Patients() {
                                             <td>NA</td>
                                             <td>1</td>
                                             <td>
-                                                <button style={{backgroundColor:"transparent", border:"none"}} onClick={() => handleView(item)}>👁️</button>
+                                                <Link to={`/patients/${item.id}`} style={{backgroundColor:"transparent", border:"none" , textDecoration:"none"}}> 👁️ </Link>
                                             </td>
                                         </tr>
                                     );
@@ -315,95 +335,6 @@ function Patients() {
                             </tbody>
                         </table>
                     </div>
-                </section>
-            </div>
-            <div>
-                <section>
-                    {view && (
-                        <div id="dispform">
-                                <table id="viewPatients">
-                                    <tbody>
-                                        <tr>
-                                            <td colSpan="2" style={{ position: "relative" }}>
-                                                <span
-                                                    onClick={() => {
-                                                        setView(false);setEdit(false);
-                                                    }}
-                                                    style={{
-                                                        position: "absolute",
-                                                        top: "10px",
-                                                        right: "10px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"
-                                                    }}
-                                                >
-                                                    ✕
-                                                </span>
-                                                { !edit ? (<span onClick={() => setEdit(true)} style={{position: "absolute",
-                                                        top: "10px",
-                                                        right: "35px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"}}> ✏️</span>) : 
-                                                    (<span onClick={() => handleEdit(patientTobeViewed)} style={{position: "absolute",
-                                                        top: "10px",
-                                                        right: "35px",
-                                                        cursor: "pointer",
-                                                        fontSize: "20px",
-                                                        fontWeight: "bold"}}> 💾</span>) }
-
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colSpan="2"><span style={{color:"#00e5c4"}}>Basic Info</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><img src={`https://localhost:7286/${patientTobeViewed.profilePhoto}`} style={{width:"80px",height:"80px", borderRadius:"45px"}} alt={patientTobeViewed.fullName}></img></td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Full Name</label></td>
-                                            {!edit ? <td>{patientTobeViewed.fullName}</td> : <td><input type="text" value={patientTobeViewed.fullName} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,fullName: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Age</label></td>
-                                            {!edit ? <td>{patientTobeViewed.age}</td> : <td><input type="text" id="eage" value={patientTobeViewed.age} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,age: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Gender</label></td>
-                                            <td>{patientTobeViewed.gender}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Blood Group</label></td>
-                                            <td>{patientTobeViewed.bloodGroup}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colSpan="2"><span style={{color:"#00e5c4"}}>Contact & Address</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><label>Email</label></td>
-                                            {!edit ? <td>{patientTobeViewed.email}</td> : <td><input type="email" value={patientTobeViewed.email} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,email: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>Phone Number</label></td>
-                                            {!edit ? <td>{patientTobeViewed.phoneNo}</td> : <td><input type="tel" pattern="[0-9]{10}" value={patientTobeViewed.phoneNo} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,phoneNo: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>City</label></td>
-                                            {!edit ? <td>{patientTobeViewed.city}</td> : <td><input type="text" value={patientTobeViewed.city} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,city: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>State</label></td>
-                                            {!edit ? <td>{patientTobeViewed.state}</td> : <td><input type="text" value={patientTobeViewed.state} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,state: e.target.value})}></input></td>}
-                                        </tr>
-                                        <tr>
-                                            <td><label>PinCode</label></td>
-                                            {!edit ? <td>{patientTobeViewed.pincode}</td> : <td><input type="text" value={patientTobeViewed.pincode} onChange={(e) => setPatientTobeViewed({...patientTobeViewed,pincode: e.target.value})}></input></td>}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                        </div>
-                    )}
                 </section>
             </div>
         </>

@@ -40,7 +40,7 @@
 }
 
 .active{
-    background-color: rgba(112, 128, 144, 0.468);;
+    background-color: rgba(112, 128, 144, 0.468);
     color: rgb(5, 5, 26);
     border-radius: 5px;
     height: 30px;
@@ -163,4 +163,19 @@ input[type="file"]::file-selector-button{
 
 #viewDoctors::-webkit-scrollbar {
     display: none;
+}
+
+.slot{
+    width: 150px;
+    height: 70px;
+    border: 0.5px solid slategray;
+    border-radius: 4px;
+    padding-left: 15px;
+}
+#dispsubhead{
+    padding: 10px;
+    gap: 25px;
+    padding-left: 25px;
+    display: flex;
+    flex-direction: row;
 }
