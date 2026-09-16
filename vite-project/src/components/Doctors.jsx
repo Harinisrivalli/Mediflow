@@ -332,7 +332,8 @@ function Doctors(){
                                                                     <span>
                                                                         <label>From</label>
                                                                         <TimePicker
-                                                                            value={item.startTime}
+                                                                            value={item.startTime 
+                                                                            ? dayjs().hour(Number(item.startTime.split(":")[0])).minute(Number(item.startTime.split(":")[1])) : null}
                                                                             onChange={(value)=> {
                                                                                 const timeString = value ? value.format('HH:mm') : ''; 
                                                                                 changeFromTime(item.day,timeString);
@@ -368,7 +369,7 @@ function Doctors(){
                                                                         />
                                                                         <label>To</label>
                                                                         <TimePicker
-                                                                            value={item.endTime}
+                                                                            value={item.endTime ? dayjs().hour(Number(item.endTime.split(":")[0])).minute(Number(item.endTime.split(":")[1])) : null}
                                                                             onChange={(value)=> {
                                                                                 const timeString = value ? value.format('HH:mm') : ''; 
                                                                                 changeToTime(item.day,timeString);
