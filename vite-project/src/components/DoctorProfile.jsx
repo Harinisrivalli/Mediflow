@@ -70,7 +70,6 @@ function DoctorProfile(){
     return(
         <>
             <div id="doctorProfile">
-                {console.log(doctor)}
                 <section id="header">
                     <Header title="DoctorProfile"/>
                 </section>
@@ -79,19 +78,6 @@ function DoctorProfile(){
                         <Link to={`/doctors`} style={{textDecoration:"none", fontSize:"25px", paddingLeft:"30px" ,top:"10px"}}>🔙</Link>
                         <label style={{paddingLeft:"20px", fontSize:"20px"}}> Doctor Profile</label> 
                         {!edit ?  <Button style={{right:"60px", position:"absolute",textTransform:"none", color:"rgb(5, 5, 26)",  background: "rgba(112, 128, 144, 0.468)"}} onClick={()=>{setEdit(true);}}> ✏️Edit Doctor</Button> : <Button style={{right:"60px", position:"absolute",textTransform:"none", color:"rgb(5, 5, 26)",  background: "rgba(112, 128, 144, 0.468)"}} onClick={() => handleEdit(doctor)}> 💾Save Doctor</Button>}
-                    </section><br/>
-                    <section id="profile">
-                        <section>
-                            <img src={`https://localhost:7286/${doctor.profilePhoto}`} style={{width:"60px",height:"60px", borderRadius:"60px", padding:"15px"}} alt="ProfilePhoto"></img>
-                        </section>
-                        <section style={{marginLeft:"20px"}}>
-                            <label style={{fontSize:"20px",color:"#00C9A7"}}>Dr {doctor.fullName}</label><br/>
-                            <label style={{fontSize:"13px"}}>{doctor.specialization} {doctor.licenseNo} {doctor.status}</label>
-                        </section>
-                        <section style={{marginLeft:"100px"}}>
-                            <label style={{ color:"#00C9A7", fontWeight:"bold"}}>{checkAvailablity(doctor.availabilitySlot)}</label><br/>
-                            <label style={{fontSize:"13px"}}>Slots Available</label>
-                        </section>
                     </section><br/>
                     <section className="part1">
                         <section className ="subpart">

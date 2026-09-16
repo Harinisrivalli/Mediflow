@@ -3,8 +3,9 @@ import Header from "../components/Header.jsx"
 import "../css/Appointments.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarPlus } from "@fortawesome/free-regular-svg-icons";
-import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
+import { finddifference, allocateMinutes } from "../common/common";
+
 function Appointments(){
     const [appointments,setAppointments] = useState([]);
     const [appointmentType, setAppointmentType] = useState("All");
@@ -33,77 +34,12 @@ function Appointments(){
         setConsultationType(value);
     }
 
-    function updateSelectedDoctor(item){
-        setSelectedDoctor(item);
-    }
-
-    function updateSelectedPatient(item){
-        setSelectedPatient(item);
-    }
-
     const [dispForm, setdispForm] = useState(false);
     function dispNewAppointmentForm() {
         setdispForm(true);
     }
 
-    function finddifference(startTime, endTime){
-        var diff = 0;
-        var start = startTime.split(':');
-        var end = endTime.split(':');
-
-        if(Number(end[0]) > Number(start[0]) ||
-            (Number(end[0]) === Number(start[0]) && Number(end[1]) >= Number(start[1]))){
-            diff = Number(end[0]) - Number(start[0]);
-        }
-        else{
-            diff = 24 - Number(start[0]) + Number(end[0]);
-        }
-
-        diff = (diff - 1) * 60 + (60 - Number(start[1])) + Number(end[1]);
-
-        return diff;
-    }
-
-    function allocateMinutes(minutes, startTime, endTime){
-        var start = startTime.split(':');
-        var end = endTime.split(':');
-        var time = [];
-        var hr = Number(start[0]);
-
-        while(minutes != 0 && minutes >= 60){
-            minutes = minutes - 60;
-
-            if(minutes > 0){
-                hr = hr + 1;
-
-                if(hr == 24){
-                    hr = 0;
-                }
-
-                time.push(hr + ":" + start[1]);
-            }
-
-            if(minutes == 0){
-                hr = hr + 1;
-                time.push(hr + ":" + start[1]);
-            }
-        }
-
-        if(minutes < 60 && minutes > 0){        
-            if((60 - start[1]) < minutes){
-                hr = hr + 1;
-
-                if(hr == 24){
-                    hr = 0;
-                }
-                time.push(hr + ":" + start[1] + "-" + (hr + 1) + ":" + (minutes - (60 - Number(start[1]))));
-            }
-        }
-        return time;
-    }
-
     async function getDoctors() {
-        var onLeave = 0, Available = 0,fullyBooked = 0 , total =0, UnAvailable=0;
         const response = await fetch("https://localhost:7286/api/doctor",{
             method:"GET",
         });
@@ -148,33 +84,28 @@ function Appointments(){
             },
             body: JSON.stringify(requestbody)
         });
-        console.log(response);
         if(response.status == 200){
             alert("Appointment Booked");
         }
         else{
-            console.log("Booking Failed");
+            alert("Booking Failed");
         }
         setdispForm(false);
         getAppointments();
     }
     async function getAppointments() {
-        var total = 0, confirmed = 0, booked = 0 , cancelled = 0, today = 0, completed = 0;
+        var total = 0, booked = 0 , cancelled = 0, today = 0, completed = 0;
         var response = await fetch("https://localhost:7286/api/appointment",{
             method:"GET",
         });
         if(response.status == 200){
             var data = await response.json();
-            console.log(data.message);
             data.message.forEach((item) => {
                 total++;
                 if(item.status == 1){
                     booked++;
                 }
-                if(item.status == 2){
-                    confirmed++;
-                }
-                else if(item.status == 4){
+                else if(item.status == 2){
                     cancelled++;
                 }
                 else if(item.status == 3){
@@ -189,7 +120,6 @@ function Appointments(){
                     today++;
                 }
             });
-            setConfirmed(confirmed);
             setCancelled(cancelled);
             setBooked(booked);
             setCompleted(completed);
@@ -202,17 +132,25 @@ function Appointments(){
     async function fetchAvailableSlots(date) {
         var avail = [];
         var resp = await fetch("https://localhost:7286/api/appointment/doctor/" + selectedDoctor.id + "?date="+ date);
+        var result = await resp.json();
         if(resp.status == 200){
-            console.log(resp.message);
+            result.message.forEach((obj) =>{
+                avail.push(obj.selectedSlots);
+            });
         }
+        setseldoctorAvailSlot(avail);
     }
 
     async function fetchPatientAvailableSlots(date) {
         var avail = [];
         var resp = await fetch("https://localhost:7286/api/appointment/patient/" + selectedPatient.id + "?date="+ date);
+        var result = await resp.json();
         if(resp.status == 200){
-            console.log(resp.message);
+            result.message.forEach((obj) =>{
+                avail.push(obj.selectedSlots);
+            });
         }
+        setselPatientAvailSlot(avail);
     }
 
     async function handleDelete(id) {
@@ -338,8 +276,8 @@ function Appointments(){
                                     }
                                 })}
                                 { appointmentType == "Cancelled" && appointments.map(item =>{
-                                    if(item.status == 4){
-                                        <tr key= {item.id}>
+                                    if(item.status == 2){
+                                        return <tr key= {item.id}>
                                             <td>{item.id}</td>
                                             <td>{item.patient.fullName}</td>
                                             <td>{item.doctor.fullName}</td>
@@ -353,8 +291,8 @@ function Appointments(){
                                     }
                                 })}
                                 { appointmentType == "Completed" && appointments.map(item =>{
-                                    if(item.status == 4){
-                                        <tr key= {item.id}>
+                                    if(item.status == 3){
+                                        return <tr key= {item.id}>
                                             <td>{item.id}</td>
                                             <td>{item.patient.fullName}</td>
                                             <td>{item.doctor.fullName}</td>
@@ -438,7 +376,8 @@ function Appointments(){
                                             var resInMinutes = finddifference(obj.startTime, obj.endTime);
                                             var availablityArray = allocateMinutes(resInMinutes,obj.startTime, obj.endTime);
                                             return availablityArray.map(time =>{
-                                                return <button key={time} onClick={() => setSelectedSlot(time)} className={selectedslot === time ? "active" : "btn" }>{time}</button>
+                                                return <button disabled = {((seldoctorAvailSlot.find(slot => slot == time) != null) ||
+                                                (selPatientAvailSlot.find(slot => slot == time) != null)) ? true : false} key={time} onClick={() => setSelectedSlot(time)} className={selectedslot === time ? "active" : "btn" }>{time}</button>
                                             })
                                         }
                                     })}
